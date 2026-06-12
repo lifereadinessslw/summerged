@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 24 &#8212; Second Timed Extended Response: Red-Light Cameras | GED RLA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; background: #f0f2f5; color: #1a1a1a; }
+.topbar { background: #1b3a5c; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 15px; font-weight: 700; }
+.session-info { font-size: 12px; color: #a8c4e0; }
+.timer { background: #0e2640; border: 1px solid #3a6b9a; border-radius: 4px; padding: 4px 12px; font-family: monospace; font-size: 14px; color: #7ec8f0; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.er-layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pane-left { border-right: 2px solid #c8d6e5; background: #fff; }
+.pane-right { background: #f7f9fc; }
+.pane-header { background: #1b3a5c; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.pane-header .cite { font-size: 11px; font-weight: 400; color: #a8c4e0; margin-top: 2px; }
+.scroll-area { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.passage h3 { font-size: 15px; font-weight: 700; color: #1b3a5c; border-bottom: 2px solid #1b3a5c; padding-bottom: 6px; margin-bottom: 14px; }
+.passage p { margin-bottom: 14px; line-height: 1.75; }
+.passage ul { margin: 8px 0 14px 20px; }
+.passage ul li { margin-bottom: 6px; line-height: 1.6; }
+.pnum { color: #888; font-size: 11px; font-weight: 700; vertical-align: super; margin-right: 3px; }
+.source { font-size: 11px; color: #888; font-style: italic; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.byline { font-size: 12px; color: #555; margin-bottom: 12px; }
+.tabs { display: flex; border-bottom: 2px solid #c8d6e5; background: #f7f9fc; padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1b3a5c; border-bottom-color: #1b75c0; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.qblock { background: #fff; border: 1px solid #d4dde8; border-left: 4px solid #1b75c0; border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; }
+.qnum { font-size: 11px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.qtext { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.qtext .ft { font-weight: 800; color: #1b3a5c; text-decoration: underline; text-decoration-color: #1b75c0; text-underline-offset: 2px; }
+.choices { list-style: none; }
+.choices li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 5px; border: 1.5px solid #d4dde8; margin-bottom: 7px; background: #fff; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.choices li:hover { border-color: #1b75c0; background: #eef4fb; }
+.choices li.selected { border-color: #1b75c0; background: #ddeeff; }
+.choices li.correct { border-color: #2a7a3b; background: #e8f5eb; }
+.choices li.wrong { border-color: #c0392b; background: #fdecea; }
+.cl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #aaa; font-weight: 700; font-size: 12px; flex-shrink: 0; background: #f8f8f8; }
+.choices li.selected .cl { border-color: #1b75c0; color: #1b75c0; }
+.choices li.correct .cl { border-color: #2a7a3b; color: #2a7a3b; }
+.choices li.wrong .cl { border-color: #c0392b; color: #c0392b; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; background: #f0f7ff; border: 1px solid #b3d0f0; border-radius: 4px; font-size: 13px; color: #1b3a5c; line-height: 1.55; }
+.reveal.open { display: block; }
+.write-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical; min-height: 80px; background: #fafcfe; color: #1a1a1a; margin-top: 4px; }
+.write-area:focus { outline: none; border-color: #1b75c0; }
+.btn-show { margin-top: 10px; padding: 5px 14px; background: #5a3e7a; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn-show:hover { background: #422d5a; }
+.tip { background: #fffde7; border: 1px solid #f0c040; border-left: 4px solid #e6a817; border-radius: 4px; padding: 12px 14px; font-size: 13px; color: #5a4200; line-height: 1.6; margin-bottom: 18px; }
+.tip strong { color: #8b5e00; }
+.bottom-bar { background: #1b3a5c; padding: 10px 22px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.btn-check { padding: 8px 20px; background: #2a7a3b; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-check:hover { background: #1d5c2b; }
+.btn-dl { padding: 8px 20px; background: #b85c00; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-dl:hover { background: #8f4700; }
+.er-prompt { background: #1b3a5c; color: #fff; padding: 14px 20px; font-size: 14px; line-height: 1.6; flex-shrink: 0; }
+.er-prompt strong { color: #7ec8f0; }
+.er-prompt em { color: #a8c4e0; font-size: 12px; }
+.er-write { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-box { background: #fff; border: 1px solid #d4dde8; border-radius: 6px; padding: 14px 16px; }
+.plan-box h4 { font-size: 12px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plan-field label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px; }
+.plan-field textarea, .plan-field input { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: inherit; resize: none; background: #fafcfe; color: #1a1a1a; line-height: 1.5; }
+.plan-field textarea:focus, .plan-field input:focus { outline: none; border-color: #1b75c0; }
+.essay-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 14px; font-size: 15px; font-family: inherit; line-height: 1.75; resize: none; background: #fff; color: #1a1a1a; min-height: 200px; }
+.essay-area:focus { outline: none; border-color: #1b75c0; }
+.er-toolbar { background: #e8eef5; border-top: 1px solid #c8d6e5; padding: 8px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.word-count { font-size: 12px; color: #1b3a5c; font-weight: 600; margin-right: auto; }
+.rubric-box { background: #fff; border-top: 2px solid #c8d6e5; padding: 10px 18px; flex-shrink: 0; }
+.rubric-box h4 { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rubric-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+.rubric-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; cursor: pointer; accent-color: #1b75c0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">GED&#174; Reasoning Through Language Arts</div>
+  <div class="session-info">Session 24 &nbsp;&middot;&nbsp; Wednesday, July 30 &nbsp;&middot;&nbsp; Week 8 &nbsp;&middot;&nbsp; Second Timed Extended Response (45 min)</div></div>
+  <div class="timer" id="timer">00:00</div>
+</div>
+<div class="er-layout">
+  <div class="pane pane-left">
+    <div class="pane-header">Passages<div class="cite">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; official GED prompt</div></div>
+    <div class="tab-group tabs"><div class="tab active" data-target="rl24a">Speech &#8212; In Favor</div><div class="tab" data-target="rl24b">Letter &#8212; Against</div></div>
+    <div class="scroll-area"><div class="passage"><div class="tab-content active" id="rl24a"><h3>Speech: Proposal for Automatic Traffic Light Cameras</h3>
+<p class="byline">Councilman Lorenzo Hart &#8212; Baler Town Council</p>
+<p><span class="pnum">1</span>The cuts to this year&#8217;s budget mean that fewer funds are available for many town departments. I propose installing automatic traffic light cameras at 10 major intersections in town. Automating this process will allow our police officers to focus on duties that require human attention, saving the cost of hiring additional officers.</p>
+<p><span class="pnum">2</span>Automatic traffic cameras have well-documented benefits. The National Highway Traffic Safety Administration states that running red lights causes hundreds of traffic fatalities and thousands of injuries annually. According to a 2010 report by the Insurance Institute for Highway Safety, red-light cameras have lowered these numbers in hundreds of U.S. cities. A 2005 Federal Highway Administration study found a 25% decrease in front-into-side auto accidents in seven cities that use red-light cameras.</p>
+<p><span class="pnum">3</span>Currently, drivers who get away with red-light violations tend to repeat the behavior. A 2009 study of a program in Montgomery County, Maryland, showed an average 78% decline in the number of red-light tickets issued after the cameras had operated for a year.</p>
+<p><span class="pnum">4</span>In addition, by citing violators who may have gone unpunished without cameras, our town would increase revenue through additional traffic fines. A single intersection in Lawrence Township, New Jersey, generated over $1 million in fines in only one year. Please support this proposal.</p>
+<p class="source">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; non-commercial use with attribution</p></div><div class="tab-content" id="rl24b"><h3>Letter to the Editor: Automatic Cameras Not an Automatic Solution</h3>
+<p class="byline">Madison Caan, civil engineer &#8212; Baler Herald</p>
+<p><span class="pnum">1</span>The town council&#8217;s proposal to install 10 automatic red-light cameras is a proposal to waste money. The company AutoCamera Inc. has promised to waive installation fees that would normally run $50,000&#8211;$100,000 per intersection. However, that same company will charge us $5,000&#8211;$6,000 each month per camera. That is at least $60,000 per year for one camera &#8212; installing 10 will cost at least $600,000 per year, enough to pay the salaries of new officers.</p>
+<p><span class="pnum">2</span>These cameras create other unexpected costs. In New Jersey and New York, several cities have been sued over the timing of traffic lights with automatic cameras. In a single December in New Jersey, traffic light company ATS settled 16 separate class-action lawsuits. Any new fines collected may pale in comparison to increased legal fees.</p>
+<p><span class="pnum">3</span>The safety benefits are also unclear. A 2005 National Highway Traffic Safety Administration report says that some cities using cameras have seen a decrease in front-into-side accidents, but rear-end collisions have increased. Speeding drivers notice cameras at the last minute and brake abruptly, causing accidents behind them.</p>
+<p><span class="pnum">4</span>In every way, actual traffic police officers are superior to automatic red-light cameras. The only investment we need to make is hiring more officers.</p>
+<p class="source">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; non-commercial use with attribution</p></div></div></div>
+  </div>
+  <div class="pane pane-right">
+    <div class="er-prompt"><strong>Second Timed Extended Response &#8212; Session 24 (45 min):</strong> Develop an argument explaining how one position is better supported than the other. Use relevant and specific evidence from both sources. <em>The better-argued position is not necessarily the one you agree with.</em></div>
+    <div class="er-write"><div class="plan-box">
+  <h4>Planning (5 min)</h4>
+  <div class="plan-row"><div class="plan-field"><label>Speech claim</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Letter claim</label><textarea rows="2" placeholder=""></textarea></div></div><div class="plan-row"><div class="plan-field"><label>Speech strongest evidence</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Letter strongest evidence</label><textarea rows="2" placeholder=""></textarea></div></div><div class="plan-row"><div class="plan-field"><label>How does each text use the 2005 NHTSA study differently?</label><textarea rows="2" placeholder="The speech uses it to show&#8230; The letter uses it to show&#8230;"></textarea></div><div class="plan-field"><label>Your thesis</label><textarea rows="2" placeholder=""></textarea></div></div>
+</div>
+<div class="plan-box">
+  <h4>Essay / Response</h4>
+  <textarea class="essay-area" rows="14" placeholder="Write your response here&#8230;"></textarea>
+</div></div>
+    <div class="er-toolbar">
+  <span class="word-count">0 words</span>
+  <button class="btn-dl" id="btnDl">&#8595; Download My Work (.docx)</button>
+</div>
+    <div class="rubric-box"><h4>Self-check</h4><div class="rubric-item"><input type="checkbox"><span>Thesis is specific and arguable.</span></div><div class="rubric-item"><input type="checkbox"><span>Uses evidence from BOTH texts with analysis.</span></div><div class="rubric-item"><input type="checkbox"><span>Addresses how both texts use the 2005 NHTSA study differently.</span></div><div class="rubric-item"><input type="checkbox"><span>Clear organization: intro &#8594; body &#8594; conclusion.</span></div><div class="rubric-item"><input type="checkbox"><span>Complete sentences and correct grammar throughout.</span></div></div>
+  </div>
+</div>
+<script>
+(function() {
+
+  // Timer
+  var secs = 0;
+  var timerEl = document.getElementById('timer');
+  if (timerEl) {
+    setInterval(function() {
+      secs++;
+      timerEl.textContent = String(Math.floor(secs/60)).padStart(2,'0') + ':' + String(secs%60).padStart(2,'0');
+    }, 1000);
+  }
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var group = this.closest('.tab-group');
+      if (!group) return;
+      group.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      group.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      this.classList.add('active');
+      var target = document.getElementById(this.getAttribute('data-target'));
+      if (target) target.classList.add('active');
+    });
+  });
+
+  // Choice selection
+  document.querySelectorAll('.choices li').forEach(function(li) {
+    li.addEventListener('click', function() {
+      var block = this.closest('.qblock');
+      block.querySelectorAll('.choices li').forEach(function(x) { x.classList.remove('selected'); });
+      this.classList.add('selected');
+    });
+  });
+
+  // Show/hide answer buttons
+  document.querySelectorAll('.btn-show').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var rev = document.getElementById(this.getAttribute('data-target'));
+      if (!rev) return;
+      if (rev.classList.contains('open')) {
+        rev.classList.remove('open');
+        this.textContent = 'Show answer';
+      } else {
+        rev.classList.add('open');
+        this.textContent = 'Hide answer';
+      }
+    });
+  });
+
+  // Check Answers
+  var btnCheck = document.getElementById('btnCheck');
+  if (btnCheck) {
+    btnCheck.addEventListener('click', function() {
+      document.querySelectorAll('.qblock[data-answer]').forEach(function(block) {
+        var correct = block.getAttribute('data-answer');
+        var selected = block.querySelector('.choices li.selected');
+        if (!selected) return;
+        var chosen = selected.getAttribute('data-letter');
+        block.querySelectorAll('.choices li').forEach(function(li) {
+          li.classList.remove('correct','wrong');
+          if (li.getAttribute('data-letter') === correct) li.classList.add('correct');
+        });
+        if (chosen !== correct) selected.classList.add('wrong');
+        var rev = block.querySelector('.reveal');
+        if (rev) rev.classList.add('open');
+      });
+      document.querySelectorAll('.reveal').forEach(function(r) { r.classList.add('open'); });
+    });
+  }
+
+  // Word counter for essay areas
+  document.querySelectorAll('.essay-area').forEach(function(ta) {
+    ta.addEventListener('input', function() {
+      var words = this.value.trim() ? this.value.trim().split(/\s+/).length : 0;
+      var wc = document.querySelector('.word-count');
+      if (wc) wc.textContent = words + ' words';
+    });
+  });
+
+  // Download
+  var btnDl = document.getElementById('btnDl');
+  if (btnDl) {
+    btnDl.addEventListener('click', function() {
+      var btn = this;
+      btn.textContent = 'Loading…';
+      btn.disabled = true;
+      if (window.docx) { buildDocx(btn); return; }
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.umd.min.js';
+      s.onload = function() { buildDocx(btn); };
+      s.onerror = function() {
+        btn.textContent = '⬇ Download My Work (.docx)';
+        btn.disabled = false;
+        alert('Could not load the download library. Please check your internet connection and try again.');
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  function buildDocx(btn) {
+    var D = window.docx;
+    var Document = D.Document, Packer = D.Packer, Paragraph = D.Paragraph, TextRun = D.TextRun;
+    var dateStr = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    var title = document.title.replace(' | GED RLA','');
+
+    function p(text, opts) {
+      opts = opts || {};
+      return new Paragraph({
+        children: [new TextRun({ text: String(text||''), font:'Calibri', size:opts.size||22, bold:opts.bold||false, italics:opts.italic||false, color:opts.color||'1a1a1a' })],
+        spacing: { before: opts.before||80, after: opts.after||80 },
+        indent: opts.indent ? { left: opts.indent } : undefined
+      });
+    }
+    function h2(text) { return p(text, { bold:true, size:26, color:'1b3a5c', before:200, after:100 }); }
+
+    var kids = [];
+    kids.push(p('GED® Reasoning Through Language Arts', { bold:true, size:28, color:'1b3a5c' }));
+    kids.push(p(title, { bold:true, size:22, color:'1b75c0' }));
+    kids.push(p('Downloaded: ' + dateStr, { italic:true, size:18, color:'666666' }));
+    kids.push(p(''));
+
+    // Collect passage text from all visible passage content
+    kids.push(h2('PASSAGE'));
+    var passageEls = document.querySelectorAll('.passage-content.active, .passage');
+    passageEls.forEach(function(el) {
+      var h3 = el.querySelector('h3');
+      if (h3) kids.push(p(h3.textContent.trim(), { bold:true, size:24, after:120 }));
+      el.querySelectorAll('p').forEach(function(pg) {
+        var t = pg.textContent.trim();
+        if (t && t.length > 10 && !t.startsWith('Source:')) kids.push(p(t, { size:21, after:100 }));
+      });
+      el.querySelectorAll('li').forEach(function(li) {
+        kids.push(p('•  ' + li.textContent.trim(), { size:21, before:40, after:40, indent:360 }));
+      });
+    });
+    var src = document.querySelector('.source, .cite');
+    if (src) kids.push(p(src.textContent.trim(), { italic:true, size:17, color:'888888' }));
+    kids.push(p(''));
+
+    // Questions
+    kids.push(h2('QUESTIONS & RESPONSES'));
+    document.querySelectorAll('.qblock').forEach(function(block, i) {
+      var qnum = block.querySelector('.qnum');
+      var qtext = block.querySelector('.qtext');
+      if (!qtext) return;
+      kids.push(p((qnum ? qnum.textContent : 'Q'+(i+1)), { bold:true, color:'1b75c0', size:20, before:160 }));
+      kids.push(p(qtext.textContent.trim(), { size:22, after:100 }));
+      block.querySelectorAll('.choices li').forEach(function(li) {
+        var letter = li.getAttribute('data-letter') || '';
+        var text = li.textContent.replace(letter,'').trim();
+        var marker = li.classList.contains('correct') ? '✓  ' : li.classList.contains('wrong') ? '✗  ' : li.classList.contains('selected') ? '►  ' : '    ';
+        var color = li.classList.contains('correct') ? '2a7a3b' : li.classList.contains('wrong') ? 'c0392b' : '333333';
+        kids.push(new Paragraph({ children:[new TextRun({ text:marker+letter+'.  '+text, font:'Calibri', size:21, color:color, bold:li.classList.contains('correct')||li.classList.contains('wrong') })], spacing:{before:40,after:40}, indent:{left:360} }));
+      });
+      var wa = block.querySelector('textarea');
+      if (wa) {
+        kids.push(p('My response:', { bold:true, size:20, color:'1b3a5c', before:100 }));
+        (wa.value.trim()||'[No response written]').split('
+').forEach(function(line) { kids.push(p(line||' ', { size:21, before:20, after:20 })); });
+      }
+      var rev = block.querySelector('.reveal');
+      if (rev && rev.classList.contains('open')) kids.push(p(rev.textContent.trim(), { italic:true, size:19, color:'0e5fa6', before:60 }));
+      kids.push(p(''));
+    });
+
+    // ER planning
+    document.querySelectorAll('.plan-box').forEach(function(box) {
+      var h4 = box.querySelector('h4');
+      if (h4) kids.push(p(h4.textContent, { bold:true, color:'1b75c0', size:20, before:160 }));
+      box.querySelectorAll('label, textarea, input').forEach(function(el) {
+        if (el.tagName === 'LABEL') { kids.push(p(el.textContent+':', { bold:true, size:19, color:'555555', before:80 })); }
+        else { kids.push(p(el.value.trim()||'[No response]', { size:21, before:10, after:10 })); }
+      });
+    });
+
+    // Essay
+    var essay = document.querySelector('.essay-area');
+    if (essay) {
+      kids.push(h2('ESSAY RESPONSE'));
+      (essay.value.trim()||'[No essay written]').split('
+').forEach(function(line) { kids.push(p(line||' ', { size:22, after:120 })); });
+    }
+
+    // Rubric
+    var rubricItems = document.querySelectorAll('.rubric-item');
+    if (rubricItems.length) {
+      kids.push(h2('SELF-CHECK'));
+      rubricItems.forEach(function(item) {
+        var cb = item.querySelector('input[type=checkbox]');
+        kids.push(p((cb && cb.checked ? '✓  ' : '□  ') + item.textContent.trim(), { size:20, before:40, after:40 }));
+      });
+    }
+
+    kids.push(p(''));
+    kids.push(p('GED® is a registered trademark of the American Council on Education. GED Testing Service LLC. All rights reserved.', { italic:true, size:17, color:'888888', before:200 }));
+
+    var doc = new Document({ sections:[{ properties:{ page:{ size:{ width:12240, height:15840 }, margin:{ top:1080, right:1080, bottom:1080, left:1080 } } }, children:kids }] });
+    Packer.toBlob(doc).then(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = title.replace(/[^a-zA-Z0-9_-]/g,'_')+'_responses.docx';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      btn.textContent = '⬇ Download My Work (.docx)'; btn.disabled = false;
+    });
+  }
+
+})();
+</script>
+</body>
+</html>
