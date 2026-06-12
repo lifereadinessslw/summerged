@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 21 &#8212; Timed Extended Response: Plastic Bags | GED RLA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; background: #f0f2f5; color: #1a1a1a; }
+.topbar { background: #1b3a5c; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 15px; font-weight: 700; }
+.session-info { font-size: 12px; color: #a8c4e0; }
+.timer { background: #0e2640; border: 1px solid #3a6b9a; border-radius: 4px; padding: 4px 12px; font-family: monospace; font-size: 14px; color: #7ec8f0; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.er-layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pane-left { border-right: 2px solid #c8d6e5; background: #fff; }
+.pane-right { background: #f7f9fc; }
+.pane-header { background: #1b3a5c; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.pane-header .cite { font-size: 11px; font-weight: 400; color: #a8c4e0; margin-top: 2px; }
+.scroll-area { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.passage h3 { font-size: 15px; font-weight: 700; color: #1b3a5c; border-bottom: 2px solid #1b3a5c; padding-bottom: 6px; margin-bottom: 14px; }
+.passage p { margin-bottom: 14px; line-height: 1.75; }
+.passage ul { margin: 8px 0 14px 20px; }
+.passage ul li { margin-bottom: 6px; line-height: 1.6; }
+.pnum { color: #888; font-size: 11px; font-weight: 700; vertical-align: super; margin-right: 3px; }
+.source { font-size: 11px; color: #888; font-style: italic; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.byline { font-size: 12px; color: #555; margin-bottom: 12px; }
+.tabs { display: flex; border-bottom: 2px solid #c8d6e5; background: #f7f9fc; padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1b3a5c; border-bottom-color: #1b75c0; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.qblock { background: #fff; border: 1px solid #d4dde8; border-left: 4px solid #1b75c0; border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; }
+.qnum { font-size: 11px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.qtext { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.qtext .ft { font-weight: 800; color: #1b3a5c; text-decoration: underline; text-decoration-color: #1b75c0; text-underline-offset: 2px; }
+.choices { list-style: none; }
+.choices li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 5px; border: 1.5px solid #d4dde8; margin-bottom: 7px; background: #fff; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.choices li:hover { border-color: #1b75c0; background: #eef4fb; }
+.choices li.selected { border-color: #1b75c0; background: #ddeeff; }
+.choices li.correct { border-color: #2a7a3b; background: #e8f5eb; }
+.choices li.wrong { border-color: #c0392b; background: #fdecea; }
+.cl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #aaa; font-weight: 700; font-size: 12px; flex-shrink: 0; background: #f8f8f8; }
+.choices li.selected .cl { border-color: #1b75c0; color: #1b75c0; }
+.choices li.correct .cl { border-color: #2a7a3b; color: #2a7a3b; }
+.choices li.wrong .cl { border-color: #c0392b; color: #c0392b; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; background: #f0f7ff; border: 1px solid #b3d0f0; border-radius: 4px; font-size: 13px; color: #1b3a5c; line-height: 1.55; }
+.reveal.open { display: block; }
+.write-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical; min-height: 80px; background: #fafcfe; color: #1a1a1a; margin-top: 4px; }
+.write-area:focus { outline: none; border-color: #1b75c0; }
+.btn-show { margin-top: 10px; padding: 5px 14px; background: #5a3e7a; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn-show:hover { background: #422d5a; }
+.tip { background: #fffde7; border: 1px solid #f0c040; border-left: 4px solid #e6a817; border-radius: 4px; padding: 12px 14px; font-size: 13px; color: #5a4200; line-height: 1.6; margin-bottom: 18px; }
+.tip strong { color: #8b5e00; }
+.bottom-bar { background: #1b3a5c; padding: 10px 22px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.btn-check { padding: 8px 20px; background: #2a7a3b; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-check:hover { background: #1d5c2b; }
+.btn-dl { padding: 8px 20px; background: #b85c00; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-dl:hover { background: #8f4700; }
+.er-prompt { background: #1b3a5c; color: #fff; padding: 14px 20px; font-size: 14px; line-height: 1.6; flex-shrink: 0; }
+.er-prompt strong { color: #7ec8f0; }
+.er-prompt em { color: #a8c4e0; font-size: 12px; }
+.er-write { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-box { background: #fff; border: 1px solid #d4dde8; border-radius: 6px; padding: 14px 16px; }
+.plan-box h4 { font-size: 12px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plan-field label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px; }
+.plan-field textarea, .plan-field input { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: inherit; resize: none; background: #fafcfe; color: #1a1a1a; line-height: 1.5; }
+.plan-field textarea:focus, .plan-field input:focus { outline: none; border-color: #1b75c0; }
+.essay-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 14px; font-size: 15px; font-family: inherit; line-height: 1.75; resize: none; background: #fff; color: #1a1a1a; min-height: 200px; }
+.essay-area:focus { outline: none; border-color: #1b75c0; }
+.er-toolbar { background: #e8eef5; border-top: 1px solid #c8d6e5; padding: 8px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.word-count { font-size: 12px; color: #1b3a5c; font-weight: 600; margin-right: auto; }
+.rubric-box { background: #fff; border-top: 2px solid #c8d6e5; padding: 10px 18px; flex-shrink: 0; }
+.rubric-box h4 { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rubric-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+.rubric-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; cursor: pointer; accent-color: #1b75c0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">GED&#174; Reasoning Through Language Arts</div>
+  <div class="session-info">Session 21 &nbsp;&middot;&nbsp; Wednesday, July 23 &nbsp;&middot;&nbsp; Week 8 &nbsp;&middot;&nbsp; Timed Extended Response (45 min)</div></div>
+  <div class="timer" id="timer">00:00</div>
+</div>
+<div class="er-layout">
+  <div class="pane pane-left">
+    <div class="pane-header">Passages<div class="cite">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; official GED prompt</div></div>
+    <div class="tab-group tabs"><div class="tab active" data-target="pb21a">Editorial &#8212; In Favor</div><div class="tab" data-target="pb21b">Letter &#8212; Against</div></div>
+    <div class="scroll-area"><div class="passage"><div class="tab-content active" id="pb21a"><h3>Saving Our City One Plastic Bag at a Time</h3>
+<p class="byline">Editorial &#8212; Gulftowne Gazette</p>
+<p><span class="pnum">1</span>The editorial staff at the Gulftowne Gazette says three cheers for the Gulftowne Ordinance Committee! Finally, they are serious about making reusable shopping bags mandatory in every store with Proposition 328.</p>
+<p><span class="pnum">2</span>Americans concerned about our environment agree that plastic bags litter our landscape and threaten wildlife. Many cities across the country and around the globe have banned their use. Paper bags are not the ideal replacement either. Cutting down trees to make paper greatly diminishes our forests. The obvious solution is to mandate that consumers bring reusable bags when they go shopping.</p>
+<p><span class="pnum">3</span>Reusable bags are made from canvas or other cloth, man-made fibers, or sturdy plastic. These bags are lightweight, washable, and durable &#8212; many styles can last for years. A widely reported study found that the United States uses 100 billion disposable plastic shopping bags every year!</p>
+<p><span class="pnum">4</span>The cost to consumers is minimal &#8212; some reusable bags cost less than a dollar. Many retailers already charge fees for disposable bags. Eventually, purchasing reusable bags is more cost-effective.</p>
+<p><span class="pnum">5</span>Those opposing mandatory use cite health concerns based on a study showing bacteria growth in reusable bags. This issue can easily be addressed by washing the bags frequently and using separate bags for meats and produce.</p>
+<p class="source">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; non-commercial use with attribution</p></div><div class="tab-content" id="pb21b"><h3>Letter to the Editor &#8212; Against Proposition 328</h3>
+<p class="byline">Theo Jones, Owner, Gulftowne Gifts</p>
+<p><span class="pnum">1</span>I strongly disagree with your editorial on the new reusable bag ordinance. Shop owners in Gulftowne rely on tourists to make a living. Unfortunately, the Ordinance Committee did not think beyond the grocery store when considering this terrible ordinance.</p>
+<p><span class="pnum">2</span>I own a gift shop. Tourists buy mementos, figurines, t-shirts, postcards, and beach supplies. Many vacation purchases fit into bags no larger than an envelope. Requiring our visitors to bring reusable bags for such purchases makes absolutely no sense.</p>
+<p><span class="pnum">3</span>Most shop owners cannot afford to provide reusable bags to customers. The bags used now have logos, addresses, phone numbers, and website addresses. They are not free. Where in the ordinance is the cost to make new multi-sized bags with store information?</p>
+<p><span class="pnum">4</span>Shop owners are also concerned about the environment, but we don&#8217;t want tourists shopping in the next town where paper and plastic bags are still used. This requirement may make sense in a grocery store, but penalizing other types of shops who don&#8217;t really contribute to the problem is unacceptable.</p>
+<p class="source">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; non-commercial use with attribution</p></div></div></div>
+  </div>
+  <div class="pane pane-right">
+    <div class="er-prompt"><strong>Timed Extended Response &#8212; Session 21 (45 min):</strong> Analyze both the editorial and the letter to determine which position is better supported. Use relevant and specific evidence from both sources. <em>&#8987; 5 min plan &middot; 35 min write &middot; 5 min review &#8212; timer running above</em></div>
+    <div class="er-write"><div class="plan-box">
+  <h4>Planning (5 min)</h4>
+  <div class="plan-row"><div class="plan-field"><label>Editorial claim</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Letter claim</label><textarea rows="2" placeholder=""></textarea></div></div><div class="plan-row"><div class="plan-field"><label>Editorial strongest evidence</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Letter strongest evidence</label><textarea rows="2" placeholder=""></textarea></div></div><div class="plan-row"><div class="plan-field"><label>Which is better supported &#8212; and why?</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Your thesis</label><textarea rows="2" placeholder=""></textarea></div></div>
+</div>
+<div class="plan-box">
+  <h4>Essay / Response</h4>
+  <textarea class="essay-area" rows="14" placeholder="Write your response here&#8230;"></textarea>
+</div></div>
+    <div class="er-toolbar">
+  <span class="word-count">0 words</span>
+  <button class="btn-dl" id="btnDl">&#8595; Download My Work (.docx)</button>
+</div>
+    <div class="rubric-box"><h4>Self-check</h4><div class="rubric-item"><input type="checkbox"><span>ARGUMENT: Clear thesis &#8212; takes a position.</span></div><div class="rubric-item"><input type="checkbox"><span>EVIDENCE: Specific details from BOTH texts.</span></div><div class="rubric-item"><input type="checkbox"><span>ORGANIZATION: Intro &#8594; body &#8594; conclusion.</span></div><div class="rubric-item"><input type="checkbox"><span>LANGUAGE: Complete sentences, correct grammar.</span></div><div class="rubric-item"><input type="checkbox"><span>COUNTERARGUMENT: Acknowledged the other side.</span></div></div>
+  </div>
+</div>
+<script src="ged.js"></script>
+</body>
+</html>

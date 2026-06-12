@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 5 &#8212; Inference | GED RLA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; background: #f0f2f5; color: #1a1a1a; }
+.topbar { background: #1b3a5c; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 15px; font-weight: 700; }
+.session-info { font-size: 12px; color: #a8c4e0; }
+.timer { background: #0e2640; border: 1px solid #3a6b9a; border-radius: 4px; padding: 4px 12px; font-family: monospace; font-size: 14px; color: #7ec8f0; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.er-layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pane-left { border-right: 2px solid #c8d6e5; background: #fff; }
+.pane-right { background: #f7f9fc; }
+.pane-header { background: #1b3a5c; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.pane-header .cite { font-size: 11px; font-weight: 400; color: #a8c4e0; margin-top: 2px; }
+.scroll-area { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.passage h3 { font-size: 15px; font-weight: 700; color: #1b3a5c; border-bottom: 2px solid #1b3a5c; padding-bottom: 6px; margin-bottom: 14px; }
+.passage p { margin-bottom: 14px; line-height: 1.75; }
+.passage ul { margin: 8px 0 14px 20px; }
+.passage ul li { margin-bottom: 6px; line-height: 1.6; }
+.pnum { color: #888; font-size: 11px; font-weight: 700; vertical-align: super; margin-right: 3px; }
+.source { font-size: 11px; color: #888; font-style: italic; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.byline { font-size: 12px; color: #555; margin-bottom: 12px; }
+.tabs { display: flex; border-bottom: 2px solid #c8d6e5; background: #f7f9fc; padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1b3a5c; border-bottom-color: #1b75c0; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.qblock { background: #fff; border: 1px solid #d4dde8; border-left: 4px solid #1b75c0; border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; }
+.qnum { font-size: 11px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.qtext { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.qtext .ft { font-weight: 800; color: #1b3a5c; text-decoration: underline; text-decoration-color: #1b75c0; text-underline-offset: 2px; }
+.choices { list-style: none; }
+.choices li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 5px; border: 1.5px solid #d4dde8; margin-bottom: 7px; background: #fff; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.choices li:hover { border-color: #1b75c0; background: #eef4fb; }
+.choices li.selected { border-color: #1b75c0; background: #ddeeff; }
+.choices li.correct { border-color: #2a7a3b; background: #e8f5eb; }
+.choices li.wrong { border-color: #c0392b; background: #fdecea; }
+.cl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #aaa; font-weight: 700; font-size: 12px; flex-shrink: 0; background: #f8f8f8; }
+.choices li.selected .cl { border-color: #1b75c0; color: #1b75c0; }
+.choices li.correct .cl { border-color: #2a7a3b; color: #2a7a3b; }
+.choices li.wrong .cl { border-color: #c0392b; color: #c0392b; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; background: #f0f7ff; border: 1px solid #b3d0f0; border-radius: 4px; font-size: 13px; color: #1b3a5c; line-height: 1.55; }
+.reveal.open { display: block; }
+.write-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical; min-height: 80px; background: #fafcfe; color: #1a1a1a; margin-top: 4px; }
+.write-area:focus { outline: none; border-color: #1b75c0; }
+.btn-show { margin-top: 10px; padding: 5px 14px; background: #5a3e7a; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn-show:hover { background: #422d5a; }
+.tip { background: #fffde7; border: 1px solid #f0c040; border-left: 4px solid #e6a817; border-radius: 4px; padding: 12px 14px; font-size: 13px; color: #5a4200; line-height: 1.6; margin-bottom: 18px; }
+.tip strong { color: #8b5e00; }
+.bottom-bar { background: #1b3a5c; padding: 10px 22px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.btn-check { padding: 8px 20px; background: #2a7a3b; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-check:hover { background: #1d5c2b; }
+.btn-dl { padding: 8px 20px; background: #b85c00; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-dl:hover { background: #8f4700; }
+.er-prompt { background: #1b3a5c; color: #fff; padding: 14px 20px; font-size: 14px; line-height: 1.6; flex-shrink: 0; }
+.er-prompt strong { color: #7ec8f0; }
+.er-prompt em { color: #a8c4e0; font-size: 12px; }
+.er-write { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-box { background: #fff; border: 1px solid #d4dde8; border-radius: 6px; padding: 14px 16px; }
+.plan-box h4 { font-size: 12px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plan-field label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px; }
+.plan-field textarea, .plan-field input { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: inherit; resize: none; background: #fafcfe; color: #1a1a1a; line-height: 1.5; }
+.plan-field textarea:focus, .plan-field input:focus { outline: none; border-color: #1b75c0; }
+.essay-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 14px; font-size: 15px; font-family: inherit; line-height: 1.75; resize: none; background: #fff; color: #1a1a1a; min-height: 200px; }
+.essay-area:focus { outline: none; border-color: #1b75c0; }
+.er-toolbar { background: #e8eef5; border-top: 1px solid #c8d6e5; padding: 8px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.word-count { font-size: 12px; color: #1b3a5c; font-weight: 600; margin-right: auto; }
+.rubric-box { background: #fff; border-top: 2px solid #c8d6e5; padding: 10px 18px; flex-shrink: 0; }
+.rubric-box h4 { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rubric-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+.rubric-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; cursor: pointer; accent-color: #1b75c0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">GED&#174; Reasoning Through Language Arts</div>
+  <div class="session-info">Session 5 &nbsp;&middot;&nbsp; Wednesday, June 11 &nbsp;&middot;&nbsp; Week 2 &nbsp;&middot;&nbsp; Inference and Implied Meaning</div></div>
+  <div class="timer" id="timer">00:00</div>
+</div>
+<div class="layout">
+  <div class="pane pane-left">
+    <div class="pane-header">Passage<div class="cite">Source: HRSA, hrsa.gov &#8212; adapted for instructional use</div></div>
+    <div class="scroll-area"><div class="passage"><h3>What Is a Community Health Center?</h3>
+<p><span class="pnum">1</span>A community health center (CHC) is a nonprofit, community-owned clinic that provides affordable medical care to people regardless of their ability to pay. Community health centers operate in medically underserved areas &#8212; neighborhoods, rural communities, and tribal lands where private doctors and hospitals are scarce or too expensive for most residents. They are funded in part by the federal government under Section 330 of the Public Health Service Act.</p>
+<p><span class="pnum">2</span>Community health centers offer a wide range of services: primary care, dental care, mental health counseling, substance use treatment, pharmacy services, and more. Fees are based on a sliding scale, meaning patients pay according to their income. A family earning very little may pay nothing at all.</p>
+<p><span class="pnum">3</span>In 2022, more than 1,400 community health centers across the United States served nearly 30 million patients. They are often the first &#8212; and only &#8212; health care provider for the communities they serve.</p>
+<p class="source">Source: HRSA, hrsa.gov &#8212; adapted for instructional use</p></div></div>
+  </div>
+  <div class="pane pane-right">
+    <div class="pane-header">Questions</div>
+    <div class="scroll-area"><div class="qblock" id="s5q1" data-answer="B">
+  <div class="qnum">Question 1</div>
+  <div class="qtext">What can you <span class="ft">infer</span> about why community health centers are located in &#8216;medically underserved areas&#8217;?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>These areas have too many health clinics and need to reduce overcrowding.</li>
+<li data-letter="B"><span class="cl">B</span>People in these areas would have no access to health care without a CHC.</li>
+<li data-letter="C"><span class="cl">C</span>The federal government requires all clinics to be built in rural locations.</li>
+<li data-letter="D"><span class="cl">D</span>Community health centers prefer to avoid competition with private hospitals.</li>
+</ul>
+  <button class="btn-show" data-target="revs5q1">Show answer</button>
+  <div class="reveal" id="revs5q1"><strong>Correct: B</strong> &#8212; Paragraph 1 states underserved areas have scarce or too-expensive private doctors. The inference: without a CHC, residents would have no access.</div>
+</div><div class="qblock" id="s5q2" data-answer="C">
+  <div class="qnum">Question 2</div>
+  <div class="qtext">A patient earns $80,000 per year. What can you <span class="ft">infer</span> about what they would pay at a community health center?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>Nothing &#8212; all services are free for everyone.</li>
+<li data-letter="B"><span class="cl">B</span>The full market rate &#8212; more than at a private clinic.</li>
+<li data-letter="C"><span class="cl">C</span>A higher fee than a low-income patient, since fees are based on income.</li>
+<li data-letter="D"><span class="cl">D</span>The same fee as every other patient &#8212; fees are fixed.</li>
+</ul>
+  <button class="btn-show" data-target="revs5q2">Show answer</button>
+  <div class="reveal" id="revs5q2"><strong>Correct: C</strong> &#8212; The sliding scale means patients pay according to income. A higher-income patient would pay more &#8212; directly implied by the word &#8216;sliding.&#8217;</div>
+</div><div class="qblock" id="s5q3" data-answer="C">
+  <div class="qnum">Question 3</div>
+  <div class="qtext">Which statement is an <span class="ft">inference</span> rather than a fact stated in the passage?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>Community health centers served nearly 30 million patients in 2022.</li>
+<li data-letter="B"><span class="cl">B</span>Fees at community health centers are based on a sliding scale.</li>
+<li data-letter="C"><span class="cl">C</span>Without community health centers, millions of Americans would have no access to medical care.</li>
+<li data-letter="D"><span class="cl">D</span>Community health centers receive federal funding under Section 330.</li>
+</ul>
+  <button class="btn-show" data-target="revs5q3">Show answer</button>
+  <div class="reveal" id="revs5q3"><strong>Correct: C</strong> &#8212; A, B, and D are stated directly. C requires reasoning beyond the text &#8212; it is an inference supported by the passage but not explicitly stated.</div>
+</div><div class="qblock" id="s5q4">
+  <div class="qnum">Question 4</div>
+  <div class="qtext">What is the <span class="ft">implied main idea</span> of this passage? Write it in one sentence.</div>
+  <textarea class="write-area" placeholder="Write your answer here&#8230;"></textarea>
+  <button class="btn-show" data-target="revs5q4">Show answer</button>
+  <div class="reveal" id="revs5q4"><strong>Model answer:</strong> Community health centers provide essential, affordable health care to Americans who need it most and would otherwise go without it.</div>
+</div><div class="tip"><strong>&#9733; GED TEST TIP:</strong> An <strong>inference</strong> is not a guess &#8212; it is a conclusion supported by text evidence + what you already know. For every inference, find the sentence in the passage that supports it.</div></div>
+    <div class="bottom-bar">
+  <button class="btn-check" id="btnCheck">Check Answers</button>
+  <button class="btn-dl" id="btnDl">&#8595; Download My Work (.docx)</button>
+</div>
+  </div>
+</div>
+<script src="ged.js"></script>
+</body>
+</html>

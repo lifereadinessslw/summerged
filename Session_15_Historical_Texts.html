@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 15 &#8212; Historical Texts | GED RLA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; background: #f0f2f5; color: #1a1a1a; }
+.topbar { background: #1b3a5c; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 15px; font-weight: 700; }
+.session-info { font-size: 12px; color: #a8c4e0; }
+.timer { background: #0e2640; border: 1px solid #3a6b9a; border-radius: 4px; padding: 4px 12px; font-family: monospace; font-size: 14px; color: #7ec8f0; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.er-layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pane-left { border-right: 2px solid #c8d6e5; background: #fff; }
+.pane-right { background: #f7f9fc; }
+.pane-header { background: #1b3a5c; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.pane-header .cite { font-size: 11px; font-weight: 400; color: #a8c4e0; margin-top: 2px; }
+.scroll-area { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.passage h3 { font-size: 15px; font-weight: 700; color: #1b3a5c; border-bottom: 2px solid #1b3a5c; padding-bottom: 6px; margin-bottom: 14px; }
+.passage p { margin-bottom: 14px; line-height: 1.75; }
+.passage ul { margin: 8px 0 14px 20px; }
+.passage ul li { margin-bottom: 6px; line-height: 1.6; }
+.pnum { color: #888; font-size: 11px; font-weight: 700; vertical-align: super; margin-right: 3px; }
+.source { font-size: 11px; color: #888; font-style: italic; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.byline { font-size: 12px; color: #555; margin-bottom: 12px; }
+.tabs { display: flex; border-bottom: 2px solid #c8d6e5; background: #f7f9fc; padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1b3a5c; border-bottom-color: #1b75c0; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.qblock { background: #fff; border: 1px solid #d4dde8; border-left: 4px solid #1b75c0; border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; }
+.qnum { font-size: 11px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.qtext { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.qtext .ft { font-weight: 800; color: #1b3a5c; text-decoration: underline; text-decoration-color: #1b75c0; text-underline-offset: 2px; }
+.choices { list-style: none; }
+.choices li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 5px; border: 1.5px solid #d4dde8; margin-bottom: 7px; background: #fff; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.choices li:hover { border-color: #1b75c0; background: #eef4fb; }
+.choices li.selected { border-color: #1b75c0; background: #ddeeff; }
+.choices li.correct { border-color: #2a7a3b; background: #e8f5eb; }
+.choices li.wrong { border-color: #c0392b; background: #fdecea; }
+.cl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #aaa; font-weight: 700; font-size: 12px; flex-shrink: 0; background: #f8f8f8; }
+.choices li.selected .cl { border-color: #1b75c0; color: #1b75c0; }
+.choices li.correct .cl { border-color: #2a7a3b; color: #2a7a3b; }
+.choices li.wrong .cl { border-color: #c0392b; color: #c0392b; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; background: #f0f7ff; border: 1px solid #b3d0f0; border-radius: 4px; font-size: 13px; color: #1b3a5c; line-height: 1.55; }
+.reveal.open { display: block; }
+.write-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical; min-height: 80px; background: #fafcfe; color: #1a1a1a; margin-top: 4px; }
+.write-area:focus { outline: none; border-color: #1b75c0; }
+.btn-show { margin-top: 10px; padding: 5px 14px; background: #5a3e7a; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn-show:hover { background: #422d5a; }
+.tip { background: #fffde7; border: 1px solid #f0c040; border-left: 4px solid #e6a817; border-radius: 4px; padding: 12px 14px; font-size: 13px; color: #5a4200; line-height: 1.6; margin-bottom: 18px; }
+.tip strong { color: #8b5e00; }
+.bottom-bar { background: #1b3a5c; padding: 10px 22px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.btn-check { padding: 8px 20px; background: #2a7a3b; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-check:hover { background: #1d5c2b; }
+.btn-dl { padding: 8px 20px; background: #b85c00; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-dl:hover { background: #8f4700; }
+.er-prompt { background: #1b3a5c; color: #fff; padding: 14px 20px; font-size: 14px; line-height: 1.6; flex-shrink: 0; }
+.er-prompt strong { color: #7ec8f0; }
+.er-prompt em { color: #a8c4e0; font-size: 12px; }
+.er-write { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-box { background: #fff; border: 1px solid #d4dde8; border-radius: 6px; padding: 14px 16px; }
+.plan-box h4 { font-size: 12px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plan-field label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px; }
+.plan-field textarea, .plan-field input { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: inherit; resize: none; background: #fafcfe; color: #1a1a1a; line-height: 1.5; }
+.plan-field textarea:focus, .plan-field input:focus { outline: none; border-color: #1b75c0; }
+.essay-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 14px; font-size: 15px; font-family: inherit; line-height: 1.75; resize: none; background: #fff; color: #1a1a1a; min-height: 200px; }
+.essay-area:focus { outline: none; border-color: #1b75c0; }
+.er-toolbar { background: #e8eef5; border-top: 1px solid #c8d6e5; padding: 8px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.word-count { font-size: 12px; color: #1b3a5c; font-weight: 600; margin-right: auto; }
+.rubric-box { background: #fff; border-top: 2px solid #c8d6e5; padding: 10px 18px; flex-shrink: 0; }
+.rubric-box h4 { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rubric-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+.rubric-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; cursor: pointer; accent-color: #1b75c0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">GED&#174; Reasoning Through Language Arts</div>
+  <div class="session-info">Session 15 &nbsp;&middot;&nbsp; Wednesday, July 9 &nbsp;&middot;&nbsp; Week 6 &nbsp;&middot;&nbsp; Historical and Social Studies Texts</div></div>
+  <div class="timer" id="timer">00:00</div>
+</div>
+<div class="layout">
+  <div class="pane pane-left">
+    <div class="pane-header">Passage<div class="cite">Source: GED Official Study Guide, GED Testing Service LLC, 2019</div></div>
+    <div class="scroll-area"><div class="passage"><h3>Harry S. Truman&#8217;s 1947 NAACP Address</h3>
+<p><span class="pnum">1</span>On June 29, 1947, President Harry S. Truman addressed the 38th Annual Conference of the National Association for the Advancement of Colored People (NAACP). Opening with a determined tone, Truman urged Americans to work together to repair racial divisions. He suggested that the country had reached a turning point &#8212; that for the first time in its history, America was ready to guarantee freedom and equality to all its citizens.</p>
+<p><span class="pnum">2</span>He continued with an assertion that the government should protect all its peoples: all Americans should possess decent homes, adequate medical care, worthwhile employment, and the right to a fair trial.</p>
+<p><span class="pnum">3</span>Truman did not paint a one-sided picture, however. At the heart of his speech was a sobering account of the social challenges facing post-World War II America, including racially motivated intimidation and mob violence. He did not dwell on these grim topics but cited them as fuel for promoting change.</p>
+<p><span class="pnum">4</span>After observing the complexities of expanding federal laws, Truman pointed to his administration&#8217;s efforts, including the 1946 appointment of the President&#8217;s Committee on Civil Rights and a request that Congress extend civil rights protections to residents of Guam and American Samoa. He also cited Eleanor Roosevelt&#8217;s work chairing the United Nations Commission on Human Rights.</p>
+<p><span class="pnum">5</span>Truman concluded by invoking words Abraham Lincoln had written in 1862, calling on the nation to remain united &#8212; not only for itself, but for future generations.</p>
+<p class="source">Source: GED Official Study Guide, GED Testing Service LLC, 2019</p></div></div>
+  </div>
+  <div class="pane pane-right">
+    <div class="pane-header">Questions</div>
+    <div class="scroll-area"><div class="qblock" id="s15q1" data-answer="B">
+  <div class="qnum">Question 1</div>
+  <div class="qtext">Why does Truman choose to speak at an NAACP conference? What does this choice reveal about <span class="ft">audience and purpose</span>?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>He was legally required to address civil rights organizations before Congress.</li>
+<li data-letter="B"><span class="cl">B</span>Speaking directly to those most affected signals genuine commitment &#8212; not just political posturing.</li>
+<li data-letter="C"><span class="cl">C</span>He believed the NAACP had more political power than Congress at the time.</li>
+<li data-letter="D"><span class="cl">D</span>He was unable to get time on the Congressional schedule.</li>
+</ul>
+  <button class="btn-show" data-target="revs15q1">Show answer</button>
+  <div class="reveal" id="revs15q1"><strong>Correct: B</strong> &#8212; Audience choice is a rhetorical decision. Speaking to the NAACP directly signals real commitment and builds trust with those most affected.</div>
+</div><div class="qblock" id="s15q2" data-answer="C">
+  <div class="qnum">Question 2</div>
+  <div class="qtext">Truman mentions &#8216;racially motivated intimidation and mob violence.&#8217; What does including this <span class="ft">historical context</span> serve?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>It shows that Truman believes the situation is hopeless.</li>
+<li data-letter="B"><span class="cl">B</span>It contradicts his overall message of optimism.</li>
+<li data-letter="C"><span class="cl">C</span>It provides evidence that justifies the urgency of his civil rights proposals.</li>
+<li data-letter="D"><span class="cl">D</span>It is an emotional appeal that weakens his argument.</li>
+</ul>
+  <button class="btn-show" data-target="revs15q2">Show answer</button>
+  <div class="reveal" id="revs15q2"><strong>Correct: C</strong> &#8212; Truman names the real problem &#8212; violence and intimidation &#8212; to show WHY action is needed. It&#8217;s evidence of urgency, not contradiction.</div>
+</div><div class="qblock" id="s15q3" data-answer="B">
+  <div class="qnum">Question 3</div>
+  <div class="qtext">What perspective is MISSING from this <span class="ft">historical</span> passage that would make it more complete?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>More information about what Eleanor Roosevelt did at the UN.</li>
+<li data-letter="B"><span class="cl">B</span>The perspectives of NAACP members and African Americans about whether Truman&#8217;s proposals were sufficient.</li>
+<li data-letter="C"><span class="cl">C</span>A list of all the legislation Truman signed as president.</li>
+<li data-letter="D"><span class="cl">D</span>A comparison between Truman&#8217;s and Roosevelt&#8217;s civil rights records.</li>
+</ul>
+  <button class="btn-show" data-target="revs15q3">Show answer</button>
+  <div class="reveal" id="revs15q3"><strong>Correct: B</strong> &#8212; Historical texts often center the perspective of powerful figures. A more complete account would include how those most affected experienced these proposals.</div>
+</div><div class="qblock" id="s15q4" data-answer="C">
+  <div class="qnum">Question 4</div>
+  <div class="qtext">Truman invokes Lincoln&#8217;s words at the end. How does this use of <span class="ft">historical reference</span> function rhetorically?</div>
+  <ul class="choices"><li data-letter="A"><span class="cl">A</span>It shows that Lincoln would have opposed civil rights legislation.</li>
+<li data-letter="B"><span class="cl">B</span>It proves that the civil rights movement began during the Civil War.</li>
+<li data-letter="C"><span class="cl">C</span>It aligns Truman&#8217;s cause with a revered figure and frames it as part of a long American tradition.</li>
+<li data-letter="D"><span class="cl">D</span>It suggests that Truman&#8217;s specific policies mirror Lincoln&#8217;s.</li>
+</ul>
+  <button class="btn-show" data-target="revs15q4">Show answer</button>
+  <div class="reveal" id="revs15q4"><strong>Correct: C</strong> &#8212; Invoking Lincoln borrows moral authority and frames Truman&#8217;s cause as continuous with America&#8217;s highest ideals.</div>
+</div><div class="tip"><strong>&#9733; GED TEST TIP:</strong> <strong>Historical texts</strong> were written at a specific time, by a specific person, for a specific audience. Always ask: whose perspective is centered? Whose is absent?</div></div>
+    <div class="bottom-bar">
+  <button class="btn-check" id="btnCheck">Check Answers</button>
+  <button class="btn-dl" id="btnDl">&#8595; Download My Work (.docx)</button>
+</div>
+  </div>
+</div>
+<script src="ged.js"></script>
+</body>
+</html>

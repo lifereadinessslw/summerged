@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sessions 17 &amp; 18 &#8212; Extended Response: Highway 17 | GED RLA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; background: #f0f2f5; color: #1a1a1a; }
+.topbar { background: #1b3a5c; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 15px; font-weight: 700; }
+.session-info { font-size: 12px; color: #a8c4e0; }
+.timer { background: #0e2640; border: 1px solid #3a6b9a; border-radius: 4px; padding: 4px 12px; font-family: monospace; font-size: 14px; color: #7ec8f0; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.er-layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pane-left { border-right: 2px solid #c8d6e5; background: #fff; }
+.pane-right { background: #f7f9fc; }
+.pane-header { background: #1b3a5c; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.pane-header .cite { font-size: 11px; font-weight: 400; color: #a8c4e0; margin-top: 2px; }
+.scroll-area { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.passage h3 { font-size: 15px; font-weight: 700; color: #1b3a5c; border-bottom: 2px solid #1b3a5c; padding-bottom: 6px; margin-bottom: 14px; }
+.passage p { margin-bottom: 14px; line-height: 1.75; }
+.passage ul { margin: 8px 0 14px 20px; }
+.passage ul li { margin-bottom: 6px; line-height: 1.6; }
+.pnum { color: #888; font-size: 11px; font-weight: 700; vertical-align: super; margin-right: 3px; }
+.source { font-size: 11px; color: #888; font-style: italic; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.byline { font-size: 12px; color: #555; margin-bottom: 12px; }
+.tabs { display: flex; border-bottom: 2px solid #c8d6e5; background: #f7f9fc; padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1b3a5c; border-bottom-color: #1b75c0; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.qblock { background: #fff; border: 1px solid #d4dde8; border-left: 4px solid #1b75c0; border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; }
+.qnum { font-size: 11px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.qtext { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.qtext .ft { font-weight: 800; color: #1b3a5c; text-decoration: underline; text-decoration-color: #1b75c0; text-underline-offset: 2px; }
+.choices { list-style: none; }
+.choices li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 5px; border: 1.5px solid #d4dde8; margin-bottom: 7px; background: #fff; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.choices li:hover { border-color: #1b75c0; background: #eef4fb; }
+.choices li.selected { border-color: #1b75c0; background: #ddeeff; }
+.choices li.correct { border-color: #2a7a3b; background: #e8f5eb; }
+.choices li.wrong { border-color: #c0392b; background: #fdecea; }
+.cl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #aaa; font-weight: 700; font-size: 12px; flex-shrink: 0; background: #f8f8f8; }
+.choices li.selected .cl { border-color: #1b75c0; color: #1b75c0; }
+.choices li.correct .cl { border-color: #2a7a3b; color: #2a7a3b; }
+.choices li.wrong .cl { border-color: #c0392b; color: #c0392b; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; background: #f0f7ff; border: 1px solid #b3d0f0; border-radius: 4px; font-size: 13px; color: #1b3a5c; line-height: 1.55; }
+.reveal.open { display: block; }
+.write-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical; min-height: 80px; background: #fafcfe; color: #1a1a1a; margin-top: 4px; }
+.write-area:focus { outline: none; border-color: #1b75c0; }
+.btn-show { margin-top: 10px; padding: 5px 14px; background: #5a3e7a; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn-show:hover { background: #422d5a; }
+.tip { background: #fffde7; border: 1px solid #f0c040; border-left: 4px solid #e6a817; border-radius: 4px; padding: 12px 14px; font-size: 13px; color: #5a4200; line-height: 1.6; margin-bottom: 18px; }
+.tip strong { color: #8b5e00; }
+.bottom-bar { background: #1b3a5c; padding: 10px 22px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.btn-check { padding: 8px 20px; background: #2a7a3b; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-check:hover { background: #1d5c2b; }
+.btn-dl { padding: 8px 20px; background: #b85c00; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-dl:hover { background: #8f4700; }
+.er-prompt { background: #1b3a5c; color: #fff; padding: 14px 20px; font-size: 14px; line-height: 1.6; flex-shrink: 0; }
+.er-prompt strong { color: #7ec8f0; }
+.er-prompt em { color: #a8c4e0; font-size: 12px; }
+.er-write { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-box { background: #fff; border: 1px solid #d4dde8; border-radius: 6px; padding: 14px 16px; }
+.plan-box h4 { font-size: 12px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plan-field label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px; }
+.plan-field textarea, .plan-field input { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: inherit; resize: none; background: #fafcfe; color: #1a1a1a; line-height: 1.5; }
+.plan-field textarea:focus, .plan-field input:focus { outline: none; border-color: #1b75c0; }
+.essay-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 14px; font-size: 15px; font-family: inherit; line-height: 1.75; resize: none; background: #fff; color: #1a1a1a; min-height: 200px; }
+.essay-area:focus { outline: none; border-color: #1b75c0; }
+.er-toolbar { background: #e8eef5; border-top: 1px solid #c8d6e5; padding: 8px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.word-count { font-size: 12px; color: #1b3a5c; font-weight: 600; margin-right: auto; }
+.rubric-box { background: #fff; border-top: 2px solid #c8d6e5; padding: 10px 18px; flex-shrink: 0; }
+.rubric-box h4 { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rubric-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+.rubric-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; cursor: pointer; accent-color: #1b75c0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">GED&#174; Reasoning Through Language Arts</div>
+  <div class="session-info">Sessions 17 &amp; 18 &nbsp;&middot;&nbsp; July 14&#8211;16 &nbsp;&middot;&nbsp; Week 7 &nbsp;&middot;&nbsp; Extended Response: Paired Texts</div></div>
+  <div class="timer" id="timer">00:00</div>
+</div>
+<div class="er-layout">
+  <div class="pane pane-left">
+    <div class="pane-header">Passages<div class="cite">Source: GED Testing Service LLC, Extended Response Scoring Guide, 2022 (official GED Ready&#174; prompt)</div></div>
+    <div class="tab-group tabs"><div class="tab active" data-target="hw17a">Text A &#8212; Press Release</div><div class="tab" data-target="hw17b">Text B &#8212; Letter to Editor</div></div>
+    <div class="scroll-area"><div class="passage"><div class="tab-content active" id="hw17a"><h3>Text A &#8212; Press Release</h3>
+<p class="byline">Office of U.S. Representative Melody Walls</p>
+<p><span class="pnum">1</span>Representative Melody Walls announced that Congress passed the highway and transit bill today. &#8220;This bill funds the expansion of Highway 17 from a two-lane highway to a four-lane thoroughfare. It will positively affect the town of Oak Falls,&#8221; Walls said. As part of the expansion, Highway 17 will move two miles east of the town of Oak Falls. The bill will ease traffic congestion and create job opportunities during and after construction.</p>
+<p><span class="pnum">2</span>Last year, Representative Walls held town hall meetings to gather opinions from her constituents about revitalizing the economy in the 12th District. Two years ago, Turnaround Motors and Bell Camera closed their factory doors, resulting in high unemployment with no immediate prospects for new businesses.</p>
+<p><span class="pnum">3</span>Improving the highway means jobs for local construction workers. Once completed, the highway will bring more long-distance travelers into the area. Some officials anticipate a 30% increase in highway traffic. An increase in travelers will attract national motel and restaurant chains, meaning permanent jobs for residents. In the future, historical features in Oak Falls &#8212; such as brick streets and an old wheat mill &#8212; will likely become tourist attractions.</p>
+<p><span class="pnum">4</span>The improved highway will eliminate eighteen-wheeler traffic through towns. A 2001 study in Texas showed that bypasses reduce traffic through towns by as much as 75%. Eliminating heavy truck traffic will also reduce road maintenance costs.</p>
+<p class="source">Source: GED Testing Service LLC, Extended Response Scoring Guide, 2022</p></div><div class="tab-content" id="hw17b"><h3>Text B &#8212; Letter to the Editor</h3>
+<p class="byline">Oak Falls Gazette</p>
+<p><span class="pnum">1</span>I am a small-business owner living in Representative Walls&#8217;s congressional district. A bill has been passed to expand Highway 17 from a two-lane highway to a four-lane thoroughfare. This change includes plans to move Highway 17 two miles to the east, which means it will now bypass our town completely. I find this unacceptable.</p>
+<p><span class="pnum">2</span>The Gazette reports that because Highway 17 runs through six states, construction will be paid for with federal road funds. That means some of our federal taxes will pay for a road that I believe will harm our town. Our town and district will lose money as a result.</p>
+<p><span class="pnum">3</span>The road construction jobs are only a temporary bandage on the wound made by our two manufacturers closing their doors. Once the road construction is finished, only minimum wage jobs will remain. In fact, the highway will bypass four cities in our district alone. Each of these towns will lose business because fewer travelers will pass through them. There is no guarantee that tourists will drive an extra two miles into our town.</p>
+<p><span class="pnum">4</span>The 2001 study Representative Walls references does show that bypasses reduce traffic and noise in towns, but the study also shows they have a negative impact on local businesses &#8212; information the press release left out.</p>
+<p class="source">Source: GED Testing Service LLC, Extended Response Scoring Guide, 2022</p></div></div></div>
+  </div>
+  <div class="pane pane-right">
+    <div class="er-prompt"><strong>Extended Response &#8212; Sessions 17 &amp; 18:</strong> Analyze both texts and determine which position is better supported by evidence. <em>Session 17: thesis. Session 18: one body paragraph.</em></div>
+    <div class="er-write"><div class="plan-box">
+  <h4>Planning (5 min)</h4>
+  <div class="plan-row"><div class="plan-field"><label>Text A main claim</label><textarea rows="2" placeholder="What is the press release arguing?"></textarea></div><div class="plan-field"><label>Text B main claim</label><textarea rows="2" placeholder="What is the letter arguing?"></textarea></div></div><div class="plan-row"><div class="plan-field"><label>Text A strongest evidence</label><textarea rows="2" placeholder="Most specific piece of evidence&#8230;"></textarea></div><div class="plan-field"><label>Text B strongest evidence</label><textarea rows="2" placeholder="Most specific piece of evidence&#8230;"></textarea></div></div><div class="plan-row"><div class="plan-field"><label>How do both texts use the 2001 study differently?</label><textarea rows="2" placeholder="Text A uses it to show&#8230; Text B uses it to show&#8230;"></textarea></div><div class="plan-field"><label>Your thesis</label><textarea rows="2" placeholder="While [Text X] argues&#8230;, [Text Y] makes a stronger case because&#8230;"></textarea></div></div>
+</div>
+<div class="plan-box">
+  <h4>Essay / Response</h4>
+  <textarea class="essay-area" rows="14" placeholder="Write your response here&#8230;"></textarea>
+</div></div>
+    <div class="er-toolbar">
+  <span class="word-count">0 words</span>
+  <button class="btn-dl" id="btnDl">&#8595; Download My Work (.docx)</button>
+</div>
+    <div class="rubric-box"><h4>Self-check</h4><div class="rubric-item"><input type="checkbox"><span>Thesis takes a clear position &#8212; not just &ldquo;both sides have good points.&rdquo;</span></div><div class="rubric-item"><input type="checkbox"><span>Both texts use the same 2001 study &#8212; I explain how each uses it differently.</span></div><div class="rubric-item"><input type="checkbox"><span>Body paragraph (S18): topic sentence &#8594; evidence &#8594; analysis &#8594; transition.</span></div><div class="rubric-item"><input type="checkbox"><span>I acknowledged the other side at least once.</span></div></div>
+  </div>
+</div>
+<script src="ged.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Session 19 &#8212; Full Essay Draft: Diamond Mining | GED RLA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 15px; background: #f0f2f5; color: #1a1a1a; }
+.topbar { background: #1b3a5c; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { font-size: 15px; font-weight: 700; }
+.session-info { font-size: 12px; color: #a8c4e0; }
+.timer { background: #0e2640; border: 1px solid #3a6b9a; border-radius: 4px; padding: 4px 12px; font-family: monospace; font-size: 14px; color: #7ec8f0; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.er-layout { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 46px); overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pane-left { border-right: 2px solid #c8d6e5; background: #fff; }
+.pane-right { background: #f7f9fc; }
+.pane-header { background: #1b3a5c; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.pane-header .cite { font-size: 11px; font-weight: 400; color: #a8c4e0; margin-top: 2px; }
+.scroll-area { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.passage h3 { font-size: 15px; font-weight: 700; color: #1b3a5c; border-bottom: 2px solid #1b3a5c; padding-bottom: 6px; margin-bottom: 14px; }
+.passage p { margin-bottom: 14px; line-height: 1.75; }
+.passage ul { margin: 8px 0 14px 20px; }
+.passage ul li { margin-bottom: 6px; line-height: 1.6; }
+.pnum { color: #888; font-size: 11px; font-weight: 700; vertical-align: super; margin-right: 3px; }
+.source { font-size: 11px; color: #888; font-style: italic; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.byline { font-size: 12px; color: #555; margin-bottom: 12px; }
+.tabs { display: flex; border-bottom: 2px solid #c8d6e5; background: #f7f9fc; padding: 0 18px; flex-shrink: 0; }
+.tab { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #555; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1b3a5c; border-bottom-color: #1b75c0; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.qblock { background: #fff; border: 1px solid #d4dde8; border-left: 4px solid #1b75c0; border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; }
+.qnum { font-size: 11px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+.qtext { font-size: 15px; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.qtext .ft { font-weight: 800; color: #1b3a5c; text-decoration: underline; text-decoration-color: #1b75c0; text-underline-offset: 2px; }
+.choices { list-style: none; }
+.choices li { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 5px; border: 1.5px solid #d4dde8; margin-bottom: 7px; background: #fff; cursor: pointer; font-size: 14px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.choices li:hover { border-color: #1b75c0; background: #eef4fb; }
+.choices li.selected { border-color: #1b75c0; background: #ddeeff; }
+.choices li.correct { border-color: #2a7a3b; background: #e8f5eb; }
+.choices li.wrong { border-color: #c0392b; background: #fdecea; }
+.cl { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; min-width: 24px; border-radius: 50%; border: 1.5px solid #aaa; font-weight: 700; font-size: 12px; flex-shrink: 0; background: #f8f8f8; }
+.choices li.selected .cl { border-color: #1b75c0; color: #1b75c0; }
+.choices li.correct .cl { border-color: #2a7a3b; color: #2a7a3b; }
+.choices li.wrong .cl { border-color: #c0392b; color: #c0392b; }
+.reveal { display: none; margin-top: 10px; padding: 10px 12px; background: #f0f7ff; border: 1px solid #b3d0f0; border-radius: 4px; font-size: 13px; color: #1b3a5c; line-height: 1.55; }
+.reveal.open { display: block; }
+.write-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 10px 12px; font-size: 14px; font-family: inherit; line-height: 1.6; resize: vertical; min-height: 80px; background: #fafcfe; color: #1a1a1a; margin-top: 4px; }
+.write-area:focus { outline: none; border-color: #1b75c0; }
+.btn-show { margin-top: 10px; padding: 5px 14px; background: #5a3e7a; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.btn-show:hover { background: #422d5a; }
+.tip { background: #fffde7; border: 1px solid #f0c040; border-left: 4px solid #e6a817; border-radius: 4px; padding: 12px 14px; font-size: 13px; color: #5a4200; line-height: 1.6; margin-bottom: 18px; }
+.tip strong { color: #8b5e00; }
+.bottom-bar { background: #1b3a5c; padding: 10px 22px; display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+.btn-check { padding: 8px 20px; background: #2a7a3b; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-check:hover { background: #1d5c2b; }
+.btn-dl { padding: 8px 20px; background: #b85c00; color: #fff; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-dl:hover { background: #8f4700; }
+.er-prompt { background: #1b3a5c; color: #fff; padding: 14px 20px; font-size: 14px; line-height: 1.6; flex-shrink: 0; }
+.er-prompt strong { color: #7ec8f0; }
+.er-prompt em { color: #a8c4e0; font-size: 12px; }
+.er-write { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.plan-box { background: #fff; border: 1px solid #d4dde8; border-radius: 6px; padding: 14px 16px; }
+.plan-box h4 { font-size: 12px; font-weight: 700; color: #1b75c0; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+.plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plan-field label { display: block; font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 3px; }
+.plan-field textarea, .plan-field input { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: inherit; resize: none; background: #fafcfe; color: #1a1a1a; line-height: 1.5; }
+.plan-field textarea:focus, .plan-field input:focus { outline: none; border-color: #1b75c0; }
+.essay-area { width: 100%; border: 1.5px solid #c8d6e5; border-radius: 4px; padding: 14px; font-size: 15px; font-family: inherit; line-height: 1.75; resize: none; background: #fff; color: #1a1a1a; min-height: 200px; }
+.essay-area:focus { outline: none; border-color: #1b75c0; }
+.er-toolbar { background: #e8eef5; border-top: 1px solid #c8d6e5; padding: 8px 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.word-count { font-size: 12px; color: #1b3a5c; font-weight: 600; margin-right: auto; }
+.rubric-box { background: #fff; border-top: 2px solid #c8d6e5; padding: 10px 18px; flex-shrink: 0; }
+.rubric-box h4 { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rubric-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #444; margin-bottom: 5px; line-height: 1.5; }
+.rubric-item input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; cursor: pointer; accent-color: #1b75c0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div><div class="brand">GED&#174; Reasoning Through Language Arts</div>
+  <div class="session-info">Session 19 &nbsp;&middot;&nbsp; Friday, July 18 &nbsp;&middot;&nbsp; Week 7 &nbsp;&middot;&nbsp; Full Essay Draft (30 min)</div></div>
+  <div class="timer" id="timer">00:00</div>
+</div>
+<div class="er-layout">
+  <div class="pane pane-left">
+    <div class="pane-header">Passages<div class="cite">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; official GED prompt</div></div>
+    <div class="tab-group tabs"><div class="tab active" data-target="dm19a">Article 1 &#8212; Against Mining</div><div class="tab" data-target="dm19b">Article 2 &#8212; For Mining</div></div>
+    <div class="scroll-area"><div class="passage"><div class="tab-content active" id="dm19a"><h3>Diamond Mining: Harmful to the Environment</h3>
+<p class="byline">by Tavin McLeavitt</p>
+<p><span class="pnum">1</span>The diamond mining industry directly affects an estimated 10 million people around the world. While some companies and countries have made a fortune from diamond mining, the industry has a long history of abusing human rights and exploiting workers. The industry&#8217;s devastating impact on the environment is another reason why diamond mining should be banned.</p>
+<p><span class="pnum">2</span>During any mining process, the soil, water, and air surrounding a mine become polluted. Large quantities of soil must be removed, reducing available natural land resources. Any mine&#8217;s expansion encroaches on natural animal habitats, decreasing wildlife populations.</p>
+<p><span class="pnum">3</span>Diamond mining also affects water supply and quality. Water is used to extract diamonds, but water is a scarce resource in Africa, where many of the world&#8217;s diamond mines are located. Canada&#8217;s Northwest Territories provides an example: companies have drained twenty lakes, causing massive changes to the environment and disrupting the natural habitats of many species.</p>
+<p><span class="pnum">4</span>Finally, energy sources used to operate diamond mines create greenhouse gases. Diesel fuels, electricity, and hydrocarbons used in diamond mining all release harmful carbons into the air. The long-term environmental impact is simply not worth the financial gains a few corporations and countries desire.</p>
+<p class="source">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; non-commercial use with attribution</p></div><div class="tab-content" id="dm19b"><h3>Diamond Mining Companies Find New Ways to Preserve the Environment</h3>
+<p class="byline">by Shaunna Rangel</p>
+<p><span class="pnum">1</span>The diamond mining industry is not the environmental villain it is often portrayed to be. Although any mining operation can disturb delicate ecology, diamond mining companies have proven to be responsive to public concern and have worked hard to reduce the impact of their operations.</p>
+<p><span class="pnum">2</span>A number of wildlife preserves have been established to protect and breed species of animals endangered by diamond mines. The Diavik Diamond Mine in Canada has implemented an advisory board to study ways to protect fish near the mining area &#8212; a program so successful it expanded to include arctic deer. In South Africa, the national parks system worked with the Peace Parks Foundation and the diamond industry to set up a conservation area near the Venetia Diamond Mine.</p>
+<p><span class="pnum">3</span>Governments are trying to reduce waste and reuse resources while mining for diamonds. Environmental management companies closely monitor the mines and routinely publish reports. Many mines do more than the minimum required by regulated standards. Researchers are working on new, less water-intensive methods of diamond extraction.</p>
+<p><span class="pnum">4</span>With support and regulation from governments, the mining industry can safely continue to benefit a large number of people who live in the countries where diamonds are mined.</p>
+<p class="source">Source: GED Ready&#174; Practice Test, GED Testing Service LLC, &#169;2018 &#8212; non-commercial use with attribution</p></div></div></div>
+  </div>
+  <div class="pane pane-right">
+    <div class="er-prompt"><strong>Extended Response &#8212; Session 19 (30 min):</strong> Analyze both articles to determine which position is better supported by evidence. Use relevant and specific evidence from both articles. <em>&#8987; 5 min plan &middot; 20 min write &middot; 5 min review</em></div>
+    <div class="er-write"><div class="plan-box">
+  <h4>Planning (5 min)</h4>
+  <div class="plan-row"><div class="plan-field"><label>Article 1 claim</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Article 2 claim</label><textarea rows="2" placeholder=""></textarea></div></div><div class="plan-row"><div class="plan-field"><label>Article 1 strongest evidence</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Article 2 strongest evidence</label><textarea rows="2" placeholder=""></textarea></div></div><div class="plan-row"><div class="plan-field"><label>Which is better supported &#8212; and why?</label><textarea rows="2" placeholder=""></textarea></div><div class="plan-field"><label>Your thesis</label><textarea rows="2" placeholder="While Article 1 argues&#8230;, Article 2 makes a stronger/weaker case because&#8230;"></textarea></div></div>
+</div>
+<div class="plan-box">
+  <h4>Essay / Response</h4>
+  <textarea class="essay-area" rows="14" placeholder="Write your response here&#8230;"></textarea>
+</div></div>
+    <div class="er-toolbar">
+  <span class="word-count">0 words</span>
+  <button class="btn-dl" id="btnDl">&#8595; Download My Work (.docx)</button>
+</div>
+    <div class="rubric-box"><h4>Self-check</h4><div class="rubric-item"><input type="checkbox"><span>Clear thesis &#8212; takes a position on which is better supported.</span></div><div class="rubric-item"><input type="checkbox"><span>Specific evidence from BOTH articles.</span></div><div class="rubric-item"><input type="checkbox"><span>Intro &#8594; body &#8594; conclusion structure.</span></div><div class="rubric-item"><input type="checkbox"><span>Complete sentences &#8212; no fragments or run-ons.</span></div><div class="rubric-item"><input type="checkbox"><span>I acknowledged the other side at least once.</span></div></div>
+  </div>
+</div>
+<script src="ged.js"></script>
+</body>
+</html>
