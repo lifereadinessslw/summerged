@@ -1,4 +1,6 @@
 (function() {
+
+  // Timer
   var secs = 0;
   var timerEl = document.getElementById('timer');
   if (timerEl) {
@@ -8,6 +10,7 @@
     }, 1000);
   }
 
+  // Tab switching
   document.querySelectorAll('.tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       var group = this.closest('.tab-group');
@@ -20,6 +23,7 @@
     });
   });
 
+  // Choice selection
   document.querySelectorAll('.choices li').forEach(function(li) {
     li.addEventListener('click', function() {
       var block = this.closest('.qblock');
@@ -28,6 +32,7 @@
     });
   });
 
+  // Show/hide answer buttons
   document.querySelectorAll('.btn-show').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var rev = document.getElementById(this.getAttribute('data-target'));
@@ -42,6 +47,7 @@
     });
   });
 
+  // Check Answers
   var btnCheck = document.getElementById('btnCheck');
   if (btnCheck) {
     btnCheck.addEventListener('click', function() {
@@ -62,6 +68,7 @@
     });
   }
 
+  // Word counter
   document.querySelectorAll('.essay-area').forEach(function(ta) {
     ta.addEventListener('input', function() {
       var words = this.value.trim() ? this.value.trim().split(/\s+/).length : 0;
@@ -70,121 +77,120 @@
     });
   });
 
+  // Download as text file - no external library needed
   var btnDl = document.getElementById('btnDl');
   if (btnDl) {
     btnDl.addEventListener('click', function() {
-      var btn = this;
-      btn.textContent = 'Loading\u2026';
-      btn.disabled = true;
-      if (window.docx) { buildDocx(btn); return; }
-      var s = document.createElement('script');
-      s.src = 'https://unpkg.com/docx@7.8.2/build/index.umd.js';
-      s.onload = function() { buildDocx(btn); };
-      s.onerror = function() {
-        btn.textContent = '\u2b07 Download My Work (.docx)';
-        btn.disabled = false;
-        alert('Could not load the download library. Please check your internet connection and try again.');
-      };
-      document.head.appendChild(s);
-    });
-  }
+      var title = document.title.replace(' | GED RLA', '');
+      var dateStr = new Date().toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      var lines = [];
 
-  function buildDocx(btn) {
-    var D = window.docx;
-    var Document = D.Document, Packer = D.Packer, Paragraph = D.Paragraph, TextRun = D.TextRun;
-    var dateStr = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    var title = document.title.replace(' | GED RLA','');
+      lines.push('GED REASONING THROUGH LANGUAGE ARTS');
+      lines.push(title);
+      lines.push('Downloaded: ' + dateStr);
+      lines.push('============================================================');
+      lines.push('');
 
-    function p(text, opts) {
-      opts = opts || {};
-      return new Paragraph({
-        children: [new TextRun({ text: String(text||''), font:'Calibri', size:opts.size||22, bold:opts.bold||false, italics:opts.italic||false, color:opts.color||'1a1a1a' })],
-        spacing: { before: opts.before||80, after: opts.after||80 },
-        indent: opts.indent ? { left: opts.indent } : undefined
-      });
-    }
-    function h2(text) { return p(text, { bold:true, size:26, color:'1b3a5c', before:200, after:100 }); }
-
-    var kids = [];
-    kids.push(p('GED\u00ae Reasoning Through Language Arts', { bold:true, size:28, color:'1b3a5c' }));
-    kids.push(p(title, { bold:true, size:22, color:'1b75c0' }));
-    kids.push(p('Downloaded: ' + dateStr, { italic:true, size:18, color:'666666' }));
-    kids.push(p(''));
-
-    kids.push(h2('PASSAGE'));
-    var passageEls = document.querySelectorAll('.passage-content.active, .passage');
-    passageEls.forEach(function(el) {
-      var h3 = el.querySelector('h3');
-      if (h3) kids.push(p(h3.textContent.trim(), { bold:true, size:24, after:120 }));
-      el.querySelectorAll('p').forEach(function(pg) {
-        var t = pg.textContent.trim();
-        if (t && t.length > 10 && !t.startsWith('Source:')) kids.push(p(t, { size:21, after:100 }));
-      });
-      el.querySelectorAll('li').forEach(function(li) {
-        kids.push(p('\u2022  ' + li.textContent.trim(), { size:21, before:40, after:40, indent:360 }));
-      });
-    });
-    kids.push(p(''));
-
-    kids.push(h2('QUESTIONS & RESPONSES'));
-    document.querySelectorAll('.qblock').forEach(function(block, i) {
-      var qnum = block.querySelector('.qnum');
-      var qtext = block.querySelector('.qtext');
-      if (!qtext) return;
-      kids.push(p((qnum ? qnum.textContent : 'Q'+(i+1)), { bold:true, color:'1b75c0', size:20, before:160 }));
-      kids.push(p(qtext.textContent.trim(), { size:22, after:100 }));
-      block.querySelectorAll('.choices li').forEach(function(li) {
-        var letter = li.getAttribute('data-letter') || '';
-        var text = li.textContent.replace(letter,'').trim();
-        var marker = li.classList.contains('correct') ? '\u2713  ' : li.classList.contains('wrong') ? '\u2717  ' : li.classList.contains('selected') ? '\u25ba  ' : '    ';
-        var color = li.classList.contains('correct') ? '2a7a3b' : li.classList.contains('wrong') ? 'c0392b' : '333333';
-        kids.push(new Paragraph({ children:[new TextRun({ text:marker+letter+'.  '+text, font:'Calibri', size:21, color:color, bold:li.classList.contains('correct')||li.classList.contains('wrong') })], spacing:{before:40,after:40}, indent:{left:360} }));
-      });
-      var wa = block.querySelector('textarea');
-      if (wa) {
-        kids.push(p('My response:', { bold:true, size:20, color:'1b3a5c', before:100 }));
-        (wa.value.trim()||'[No response written]').split('\n').forEach(function(line) { kids.push(p(line||' ', { size:21, before:20, after:20 })); });
+      // Passage text
+      lines.push('PASSAGE');
+      lines.push('------------------------------------------------------------');
+      var passageEl = document.querySelector('.passage-content.active') || document.querySelector('.passage');
+      if (passageEl) {
+        var h3 = passageEl.querySelector('h3');
+        if (h3) { lines.push(h3.textContent.trim()); lines.push(''); }
+        passageEl.querySelectorAll('p').forEach(function(p) {
+          var t = p.textContent.trim();
+          if (t && t.length > 10 && !t.startsWith('Source:')) { lines.push(t); lines.push(''); }
+        });
+        passageEl.querySelectorAll('li').forEach(function(li) {
+          lines.push('  - ' + li.textContent.trim());
+        });
       }
-      var rev = block.querySelector('.reveal');
-      if (rev && rev.classList.contains('open')) kids.push(p(rev.textContent.trim(), { italic:true, size:19, color:'0e5fa6', before:60 }));
-      kids.push(p(''));
-    });
+      lines.push('');
 
-    document.querySelectorAll('.plan-box').forEach(function(box) {
-      var h4 = box.querySelector('h4');
-      if (h4) kids.push(p(h4.textContent, { bold:true, color:'1b75c0', size:20, before:160 }));
-      box.querySelectorAll('label, textarea, input').forEach(function(el) {
-        if (el.tagName === 'LABEL') { kids.push(p(el.textContent+':', { bold:true, size:19, color:'555555', before:80 })); }
-        else { kids.push(p(el.value.trim()||'[No response]', { size:21, before:10, after:10 })); }
+      // Questions
+      lines.push('QUESTIONS AND RESPONSES');
+      lines.push('------------------------------------------------------------');
+      document.querySelectorAll('.qblock').forEach(function(block, i) {
+        var qnum = block.querySelector('.qnum');
+        var qtext = block.querySelector('.qtext');
+        if (!qtext) return;
+        lines.push('');
+        lines.push((qnum ? qnum.textContent.trim() : 'Question ' + (i+1)).toUpperCase());
+        lines.push(qtext.textContent.trim());
+        lines.push('');
+        block.querySelectorAll('.choices li').forEach(function(li) {
+          var letter = li.getAttribute('data-letter') || '';
+          var text = li.textContent.replace(letter, '').trim();
+          var marker = li.classList.contains('correct') ? '[CORRECT]  ' :
+                       li.classList.contains('wrong')   ? '[WRONG]    ' :
+                       li.classList.contains('selected') ? '[SELECTED] ' : '           ';
+          lines.push(marker + letter + '.  ' + text);
+        });
+        var wa = block.querySelector('textarea');
+        if (wa) {
+          lines.push('');
+          lines.push('My answer:');
+          lines.push(wa.value.trim() || '[No response written]');
+        }
+        var rev = block.querySelector('.reveal');
+        if (rev && rev.classList.contains('open')) {
+          lines.push('');
+          lines.push('Answer key: ' + rev.textContent.trim());
+        }
       });
-    });
 
-    var essay = document.querySelector('.essay-area');
-    if (essay) {
-      kids.push(h2('ESSAY RESPONSE'));
-      (essay.value.trim()||'[No essay written]').split('\n').forEach(function(line) { kids.push(p(line||' ', { size:22, after:120 })); });
-    }
+      // Planning
+      var planBoxes = document.querySelectorAll('.plan-box');
+      if (planBoxes.length) {
+        lines.push(''); lines.push('');
+        lines.push('PLANNING NOTES');
+        lines.push('------------------------------------------------------------');
+        planBoxes.forEach(function(box) {
+          var h4 = box.querySelector('h4');
+          if (h4) { lines.push(''); lines.push(h4.textContent.trim()); }
+          box.querySelectorAll('label, textarea, input').forEach(function(el) {
+            if (el.tagName === 'LABEL') lines.push(el.textContent.trim() + ':');
+            else lines.push(el.value.trim() || '[No response]');
+          });
+        });
+      }
 
-    var rubricItems = document.querySelectorAll('.rubric-item');
-    if (rubricItems.length) {
-      kids.push(h2('SELF-CHECK'));
-      rubricItems.forEach(function(item) {
-        var cb = item.querySelector('input[type=checkbox]');
-        kids.push(p((cb && cb.checked ? '\u2713  ' : '\u25a1  ') + item.textContent.trim(), { size:20, before:40, after:40 }));
-      });
-    }
+      // Essay
+      var essay = document.querySelector('.essay-area');
+      if (essay) {
+        lines.push(''); lines.push('');
+        lines.push('ESSAY RESPONSE');
+        lines.push('------------------------------------------------------------');
+        lines.push(essay.value.trim() || '[No essay written]');
+      }
 
-    kids.push(p(''));
-    kids.push(p('GED\u00ae is a registered trademark of the American Council on Education. GED Testing Service LLC. All rights reserved.', { italic:true, size:17, color:'888888', before:200 }));
+      // Rubric
+      var rubricItems = document.querySelectorAll('.rubric-item');
+      if (rubricItems.length) {
+        lines.push(''); lines.push('');
+        lines.push('SELF-CHECK');
+        lines.push('------------------------------------------------------------');
+        rubricItems.forEach(function(item) {
+          var cb = item.querySelector('input[type=checkbox]');
+          lines.push((cb && cb.checked ? '[x] ' : '[ ] ') + item.textContent.trim());
+        });
+      }
 
-    var doc = new Document({ sections:[{ properties:{ page:{ size:{ width:12240, height:15840 }, margin:{ top:1080, right:1080, bottom:1080, left:1080 } } }, children:kids }] });
-    Packer.toBlob(doc).then(function(blob) {
+      lines.push('');
+      lines.push('============================================================');
+      lines.push('GED is a registered trademark of the American Council on Education.');
+
+      var text = lines.join('\n');
+      var blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      a.href = url; a.download = title.replace(/[^a-zA-Z0-9_-]/g,'_')+'_responses.docx';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      a.href = url;
+      a.download = title.replace(/[^a-zA-Z0-9_-]/g, '_') + '_responses.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      btn.textContent = '\u2b07 Download My Work (.docx)'; btn.disabled = false;
     });
   }
 
